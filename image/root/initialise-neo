@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# executes a query with cypher-shell and puts the result
+# text (stdout + stderr) in output
+query () {
+    output=$((cypher-shell -u neo4j -p $PASSWORD "$@") 2>&1)
+}
+
+log () {
+    printf "\n\n----------------------------------------------------\n"
+    printf "$(basename $0): $@"
+    printf "\n----------------------------------------------------\n\n"
+}
+
+attempts=0
+
+# as long as the server is not up (or we tried 10 times), repeat
+while : ; do
+    query "CALL db.indexes"
+    ((attempts++))
+    if [[ $attempts == "10" ]] ; then
+        log "Tried $attempts times to reach neo4j with cypher-shell, but to no avail. Giving up."
+        exit 2
+    fi
+    [[ $output =~ "Connection refused" || "$attempts" == "10" ]] || break
+done
+
+# If the password is not valid, the error message will be
+#
+# 'The client is unauthorized due to authentication failure.'
+#
+# which indicates that this is the absolutely first startup where
+# the default password neo4j is still used, so we try to change
+# it.
+
+if [[ $output =~ unauthorized ]] ; then
+    new_pass=$PASSWORD
+    PASSWORD=neo4j
+    query "CALL dbms.changePassword('$new_pass')"
+    if [ $? != 0 ] ; then
+        log "Cannot change the password to the one you provided in \$PASSWORD."
+        exit 3
+    fi
+    # now that we have successfully changed the password, reassign it to PASSWORD
+    log "Successfully changed the password"
+    PASSWORD=$new_pass
+fi
+
+for f in /import/*.cypher ; do
+    output=$((cat $f | cypher-shell -u neo4j -p $PASSWORD) 2>&1)
+    if [ $? != 0 ] ; then
+        log "Cannot import the cypher file $f. Output: $output"
+    else
+        log "Successfully imported cypher file $f."
+        mv $f $f.imported
+    fi
+done
+
+# if [ $output =~ /CREDENTIALS_EXPIRED/ ] ; then echo expired ; fi
+
+# oo many arguments
+# if [[ $output =~ /CREDENTIALS_EXPIRED/ ]] ; then echo expired ; fi
+# if [[ $output =~ CREDENTIALS_EXPIRED ]] ; then echo expired ; fi
+
+# output=$((cypher-shell -u neo4j -p neo4j "CREATE INDEX ON :User(name)") 2>&1)
+# if [[ $output =~ CREDENTIALS_EXPIRED ]] ; then echo expired ; fi
+
+# output=$((cypher-shell -u neo4j -p neo4j "CALL dbms.changePassword('password')") 2>&1)
+# echo $output
+
+# output=$((cypher-shell -u neo4j -p neo4j "CALL dbms.changePassword('password')") 2>&1)
+# echo $output
+#  is unauthorized due to authentication failure.
+# output=$((cypher-shell -u neo4j -p password "CREATE INDEX ON :User(name)") 2>&1)
+# echo $output
+
+# output=$((cypher-shell -u neo4j -p password "CREATE INDEX ON :User(uid)") 2>&1)
+# echo $?
+
+# exit

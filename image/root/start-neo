@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#
+# We want to change the password to the content of $PASSWORD
+# but it should be different than the default
+
+if [ "$PASSWORD" == "neo4j" ] ; then
+    printf "\n\nPlease provide a password other than the default 'neo4j' with -e PASSWORD=...\n\n"
+    exit 1
+fi
+
+/initialise-neo &
+
+cmd="$@"
+if [ -z "$cmd" ] ; then
+    cmd=neo4j
+fi
+
+export NEO4J_dbms_security_procedures_unrestricted="apoc.\*"
+
+exec /sbin/tini -g -- /docker-entrypoint.sh $cmd
