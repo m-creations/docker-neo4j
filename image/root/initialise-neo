@@ -47,6 +47,8 @@ if [[ $output =~ unauthorized ]] ; then
 fi
 
 for f in /import/*.cypher ; do
+    # check for existence, as we will enter here if there are no files
+    [ -e "$f" ] || continue
     output=$((cat $f | cypher-shell -u neo4j -p $PASSWORD) 2>&1)
     if [ $? != 0 ] ; then
         log "Cannot import the cypher file $f. Output: $output"
