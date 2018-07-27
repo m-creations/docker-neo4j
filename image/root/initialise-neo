@@ -14,6 +14,9 @@ log () {
 
 attempts=0
 
+# This wait time is crucial to allow Neo4J to fully bring up its interface
+sleep 1
+
 # as long as the server is not up (or we tried 10 times), repeat
 while : ; do
     query "CALL db.indexes"
