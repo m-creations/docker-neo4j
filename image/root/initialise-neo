@@ -57,26 +57,3 @@ for f in /import/*.cypher ; do
         mv $f $f.imported
     fi
 done
-
-# if [ $output =~ /CREDENTIALS_EXPIRED/ ] ; then echo expired ; fi
-
-# oo many arguments
-# if [[ $output =~ /CREDENTIALS_EXPIRED/ ]] ; then echo expired ; fi
-# if [[ $output =~ CREDENTIALS_EXPIRED ]] ; then echo expired ; fi
-
-# output=$((cypher-shell -u neo4j -p neo4j "CREATE INDEX ON :User(name)") 2>&1)
-# if [[ $output =~ CREDENTIALS_EXPIRED ]] ; then echo expired ; fi
-
-# output=$((cypher-shell -u neo4j -p neo4j "CALL dbms.changePassword('password')") 2>&1)
-# echo $output
-
-# output=$((cypher-shell -u neo4j -p neo4j "CALL dbms.changePassword('password')") 2>&1)
-# echo $output
-#  is unauthorized due to authentication failure.
-# output=$((cypher-shell -u neo4j -p password "CREATE INDEX ON :User(name)") 2>&1)
-# echo $output
-
-# output=$((cypher-shell -u neo4j -p password "CREATE INDEX ON :User(uid)") 2>&1)
-# echo $?
-
-# exit
