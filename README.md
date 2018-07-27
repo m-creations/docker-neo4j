@@ -1,4 +1,4 @@
-Neo4J with [APOC (Awesome Procedures On Cyper)](https://guides.neo4j.com/apoc).
+Neo4J with [APOC (Awesome Procedures On Cypher)](https://guides.neo4j.com/apoc).
 
 ## Quickstart
 
