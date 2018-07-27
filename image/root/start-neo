@@ -17,5 +17,6 @@ if [ -z "$cmd" ] ; then
 fi
 
 export NEO4J_dbms_security_procedures_unrestricted="apoc.\*"
+export NEO4J_apoc_trigger_enabled=true
 
 exec /sbin/tini -g -- /docker-entrypoint.sh $cmd
